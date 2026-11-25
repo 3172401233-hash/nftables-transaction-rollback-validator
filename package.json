@@ -1,0 +1,30 @@
+{
+  "name": "nftables-transaction-rollback-validator",
+  "version": "1.0.0",
+  "description": "Pure Node.js simulator and validator for atomic nftables batch transactions, stale handles, set conflicts, and recovery order.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=24.16.0"
+  },
+  "bin": {
+    "nft-tx-verify": "bin/nft-tx-verify.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./parser": "./src/parser.js",
+    "./transaction": "./src/transaction.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "verify:example": "node bin/nft-tx-verify.js examples/handle-stale-batch.json"
+  },
+  "keywords": [
+    "nftables",
+    "transaction",
+    "rollback",
+    "handle",
+    "node:test"
+  ],
+  "license": "MIT"
+}

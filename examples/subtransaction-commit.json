@@ -1,0 +1,76 @@
+{
+  "description": "The second subtransaction is interrupted at commit. Only first remains visible; third is skipped.",
+  "family": "inet",
+  "table": "filter",
+  "failure": {
+    "phase": "commit",
+    "subtransactionId": "harden-ssh",
+    "outcome": "aborted"
+  },
+  "snapshot": {
+    "tables": ["filter"],
+    "chains": [
+      {
+        "name": "input",
+        "type": "filter",
+        "hook": "input",
+        "priority": 0,
+        "policy": "accept"
+      }
+    ],
+    "sets": [
+      {
+        "name": "trusted_v4",
+        "type": "ipv4_addr",
+        "elements": ["198.51.100.10"]
+      }
+    ],
+    "rules": [
+      { "handle": 20, "chain": "input", "expression": "tcp dport 22 accept", "action": "accept" }
+    ]
+  },
+  "subtransactions": [
+    {
+      "id": "add-established",
+      "commands": [
+        {
+          "op": "add-rule",
+          "chain": "input",
+          "newHandle": 100,
+          "expression": "ct state established,related accept",
+          "action": "accept"
+        }
+      ]
+    },
+    {
+      "id": "harden-ssh",
+      "commands": [
+        {
+          "op": "add-rule",
+          "chain": "input",
+          "newHandle": 101,
+          "beforeHandle": 20,
+          "expression": "tcp dport 22 ip saddr @trusted_v4 accept",
+          "action": "accept"
+        },
+        {
+          "op": "delete-rule",
+          "chain": "input",
+          "handle": 20
+        }
+      ]
+    },
+    {
+      "id": "drop-rest",
+      "commands": [
+        {
+          "op": "add-rule",
+          "chain": "input",
+          "newHandle": 102,
+          "expression": "drop",
+          "action": "drop"
+        }
+      ]
+    }
+  ]
+}
